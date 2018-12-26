@@ -11,6 +11,8 @@ https://github.com/googleearthengine/remothon_2018_team_disaster/tree/master/GEE
 
 ![rplot001](https://user-images.githubusercontent.com/13476428/50438969-950ab600-0933-11e9-9b36-85354ff2e684.png)
 
+## Presentation / プレゼンファイル
+https://docs.google.com/presentation/d/1ySZByZBE3T5HhY42S9YMtNadgyngwqttYml4oSlRvd0/edit#slide=id.p1
 
 ## 作業用データ
 * [NDVI差分演算結果GeoTIFF](https://github.com/googleearthengine/remothon_2018_team_disaster/blob/master/gee_.tif)
