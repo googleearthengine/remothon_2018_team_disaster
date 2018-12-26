@@ -1,0 +1,80 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var s2 = ee.ImageCollection("COPERNICUS/S2"),
+    imageVisParam2 = {"opacity":1,"bands":["nd"],"min":-0.28211505615575405,"max":0.2614805434957871,"palette":["0007ff","2d8b42","edff5c","ff5b36","ff0000"]};
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var visparam_ndvi = ['FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718',
+               '74A901', '66A000', '529400', '3E8601', '207401', '056201',
+               '004C00', '023B01', '012E01', '011D01', '011301'];
+
+var visparam_diff = ['ff0000', 'ff5b36', 'edff5c', '2d8b42', '0007ff'];
+
+
+// Define names of bands.
+var bands = [
+    "B2_min",
+    "B3_min",
+    "B4_min",
+    "B5_min",
+    "B6_min",
+    "B7_min",
+    "B8_min",
+    "B9_min",
+    "B11_min",
+    "B12_min"
+  ];
+
+// Define the boundary of operation.
+var area = ee.Geometry.Polygon(
+    [
+      [133.64689749333183,33.83090489745764],
+      [133.66440695378105,33.83090489745764],
+      [133.6642352924041,33.84017316151725],
+      [133.64689749333183,33.840137516273124],
+      [133.64689749333183,33.83090489745764]
+    ]
+  );
+
+
+// Get images after the disaster.
+var s2_af = ee.ImageCollection(s2
+  .filterBounds(area)
+  .filterDate('2018-07-10', '2018-12-25')
+  .filterMetadata("CLOUDY_PIXEL_PERCENTAGE","not_greater_than",5)
+);
+
+// Create an image collection without clouds.
+var s2_nc = ee.ImageCollection(s2
+  .filterBounds(area)
+  .filterDate('2017-01-01', '2017-12-31')
+  .filterMetadata("CLOUDY_PIXEL_PERCENTAGE","not_greater_than",5)
+);
+
+// Create a simple composit image by median.
+var s2_af_sc = s2_af.reduce(ee.Reducer.median()).clip(area);
+var s2_nc_sc = s2_nc.reduce(ee.Reducer.median()).clip(area);
+
+
+// NDVI 
+var s2_af_sc_ndvi = s2_af_sc.normalizedDifference(['B8_median', 'B4_median']);
+var s2_nc_sc_ndvi = s2_nc_sc.normalizedDifference(['B8_median', 'B4_median']);
+
+var diff_ndvi = s2_af_sc_ndvi.subtract(s2_nc_sc_ndvi);
+
+// Move to area.
+Map.centerObject(area);
+
+// Add objects to layer.
+Map.addLayer(s2_af_sc_ndvi, {min: 0, max: 1, palette: visparam_ndvi}, 'NDVI');
+Map.addLayer(s2_nc_sc_ndvi, {min: 0, max: 1, palette: visparam_ndvi}, 'NDVI');
+Map.addLayer(diff_ndvi, {min: -0.26, max: 0.26, palette: visparam_diff}, 'Subtruct');
+
+// Export the result to Google Drive.
+Export.image.toDrive({
+  image: diff_ndvi,
+  description: 'subtract',
+  fileNamePrefix: 'gee_subtract',
+  region: area,
+  scale: 30,
+  crs: 'EPSG:3857'
+});
+

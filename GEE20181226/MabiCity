@@ -1,0 +1,76 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var ln8_realtime = ee.ImageCollection("LANDSAT/LC08/C01/T1_RT_TOA"),
+    ln8_raw = ee.ImageCollection("LANDSAT/LC08/C01/T2");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+// トゥルーカラーパレットを定義する。
+var trueColorParam = {
+  bands: ['B4', 'B3', 'B2'],
+  gamma: 1,
+  max: 0.3,
+  min: 0.0
+};
+
+// フォールスカラーパレットを定義する。
+var falseColorParam = {
+  bands: ['B5', 'B4', 'B3'],
+  gamma: 1,
+  max: 0.3,
+  min: 0.0
+};
+
+// ナチュラルカラーパレットを定義する。
+var naturalColorParam = {
+  bands: ['B4', 'B5', 'B3'],
+  gamma: 1,
+  max: 0.3,
+  min: 0.0
+};
+
+var before = ui.Map();
+var after = ui.Map();
+
+var point = ee.Geometry.Point(133.692239,34.629078);
+//var point = ee.Geometry.Point(105.7678825,-6.0192211);
+
+var mabi_before  = ee.Image(ln8_realtime
+                      .filterBounds(point)
+                      .filterDate("2016-01-01","2017-12-31")
+                      .sort("CLOUD_COVER")
+                      .first()
+                    );
+
+var mabi_after  = ee.Image(ln8_realtime
+                      .filterBounds(point)
+                      .filterDate("2018-06-28","2018-07-31")
+                      .sort("CLOUD_COVER")
+                      .first()
+                    );
+// var mabi_after  = ee.Image(ln8_realtime
+//                       .filterBounds(point)
+//                       .filterDate("2018-12-01","2018-12-25")
+//                       .sort("CLOUD_COVER")
+//                       .first()
+//                     );
+
+
+before.addLayer(mabi_before, trueColorParam, 'Before');
+after.addLayer(mabi_after, trueColorParam, 'After');
+
+before.add(ui.Label('Before'));
+after.add(ui.Label('After'));
+
+before.setControlVisibility(true);
+after.setControlVisibility(true);
+
+print(mabi_before);
+print(mabi_after);
+
+var maps = [];
+
+maps.push(before);
+maps.push(after);
+
+var linker = ui.Map.Linker(maps);
+ui.root.widgets().reset(maps);
+
+maps[0].centerObject(point, 13);

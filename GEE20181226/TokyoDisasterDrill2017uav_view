@@ -1,0 +1,4 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var image = ee.Image("users/mapconcierge/dronebird/Tokyo2017-09-02chofu01_ortho"),
+    geometry = /* color: #d63000 */ee.Geometry.Point([139.53741788864136, 35.64111952110943]);
+/***** End of imports. If edited, may not auto-convert in the playground. *****/

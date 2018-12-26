@@ -1,0 +1,13 @@
+// Export the image to an Earth Engine asset.
+Export.image.toAsset({
+  image: band4,
+  description: 'imageToAssetExample',
+  assetId: 'exampleExport',
+  scale: 30,
+  region: geometry,
+  pyramidingPolicy: {
+    'b4_mean': 'mean',
+    'b4_sample': 'sample',
+    'b4_max': 'max'
+  }
+});

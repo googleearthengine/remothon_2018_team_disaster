@@ -1,0 +1,87 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var s2 = ee.ImageCollection("COPERNICUS/S2"),
+    image = ee.Image("users/akkochan519/Oita_ortho_after");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+
+
+
+// Create a dictionary of labels and visualizations. 
+// Set up a cloud-free composite
+var s2 = ee.ImageCollection('COPERNICUS/S2');
+
+// Map the function over one year of data and take the median.
+var composite1 = s2.filterDate('2018-04-10', '2018-04-21')
+
+
+// Create a dictionary of labels and visualizations.
+
+var s2 = ee.ImageCollection('COPERNICUS/S2');
+
+// Map the function over one year of data and take the median.
+var composite2 = s2.filterDate('2018-07-10', '2018-07-25')
+
+
+var NAMES = [
+  '災害発生前（2018年４月中旬）',
+  '災害発生後（2018年７月中旬）',
+];
+
+var maps1 = [];
+NAMES.forEach(function(name, index) {
+  var map = ui.Map();
+  map.add(ui.Label(name));
+  map.addLayer(composite1,{bands: ['B4', 'B3', 'B2'], min: 0, max:2000}, name);
+  map.setControlVisibility(true);
+  maps1.push(map);
+});
+var maps2 = [];
+NAMES.forEach(function(name, index) {
+  var map = ui.Map();
+  map.add(ui.Label(name));
+  map.addLayer(composite2,{bands: ['B4', 'B3', 'B2'], min: 0, max:3000},name);
+  map.setControlVisibility(false);
+  maps2.push(map);
+});
+var linker = ui.Map.Linker(maps1, maps2);
+// Enable zooming on the top-left map.
+maps1[(0)].setControlVisibility({zoomControl: true});
+// Show the scale (e.g. '500m') on the bottom-right map.
+maps1[0].setControlVisibility({scaleControl: true});
+maps2[1].setControlVisibility({scaleControl: true});
+// Create a title.
+var title = ui.Label('立川トンネル付近', {
+  stretch: 'horizontal',
+  textAlign: 'center',
+  fontWeight: 'bold',
+  fontSize: '32px',
+  color: 'blue'
+});
+
+
+// Create a panel to hold our widgets.
+var panel = ui.Panel();
+panel.style().set('width', '300px');
+
+
+// Create a grid of maps.
+var mapGrid = ui.Panel([
+    ui.Panel([maps1[0]], null, {stretch: 'both'}),
+    ui.Panel([maps2[1]], null, {stretch: 'both'})
+  ],
+  ui.Panel.Layout.Flow('horizontal'), {stretch: 'both'}
+);
+
+// Add the maps and title to the ui.root.
+ui.root.widgets().reset([title, mapGrid]);
+ui.root.setLayout(ui.Panel.Layout.Flow('vertical'));
+
+// Center the maps to Quang Son.
+maps1[0].setCenter(133.654, 33.836, 16);
+maps2[1].setCenter(133.654, 33.836, 16);
+
+ui.Map.Linker([maps1[0], maps2[1]]);
+
+
+// Cr
+
+
